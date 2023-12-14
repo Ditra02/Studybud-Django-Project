@@ -1,0 +1,104 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+    <style>
+        .room-container{
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+        }
+    </style>
+
+
+    <div class="room-container">
+
+        <div>
+            
+            <h1>
+                {{ room.id }} - {{ room.name }}
+            </h1>
+            <br>
+            {{ room.description }}
+            <br>
+            
+            <div class="comment-wrapper">
+                <h3>Conversation</h3>
+                <hr>
+                
+                {% for message in room_messages %}
+                
+                    <div>
+                        
+                        <small>
+
+                            @{{  message.user }}  {{  message.created | timesince  }} ago
+                            
+                            {% if request.user == message.user and updating_message != True %}
+    
+                                <a href="{% url 'delete-message' message.id %}?next={{ request.path|urlencode }}">Delete</a>
+                                <a href="{% url 'update-message' message.id %}">Update</a>
+
+                            {% endif %}
+                        
+                        </small>
+
+                        <!-- hanya akan di run jika sedang update karena message_updated_id ada nilainya -->
+                        {% if message.id != message_updated_id %}
+
+                            <p>
+                                {{ message.body }}
+                            </p>
+                        
+                        {% else %}
+                            
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <input type="text" value="{{ body }}" name="body">
+                            </form>
+
+                        {% endif %}
+
+                    </div>
+                
+                {% endfor %}
+
+            </div>
+            
+            {% if request.user.is_authenticated %}
+            
+                <div class="comment-form">
+
+                    <form action="" method="post">
+
+                        {% csrf_token %}
+                        
+                        {% if updating_message != True %}
+
+                            <input type="text" name="body" placeholder="Write your message here...">
+                        
+                        {% endif %}
+
+                    </form>
+
+                </div>
+            
+            {% endif %}
+
+        </div>
+
+        <div>
+            <h3>Participants</h3>
+            <hr>
+
+            {% for user in participants %}
+
+            <div>
+                <p>@{{ user.username }}</p>
+            </div>
+            
+            {% endfor %}
+        </div>
+            
+    </div>
+
+{% endblock %}
