@@ -1,0 +1,1244 @@
+Apa itu web FrameWork ? 
+    koleksi module-module, packages dan library yang di desain untuk mempercepat development
+
+MVT (Model-View-Template)
+    Model - Data Access Layer --> untuk modelling Data, akan menjadi tabel database 
+    Template - presentation layer --> apa yang user liat, web page 
+    View - bussiness logic
+
+    misal ada user akses facebook.com dengan url,
+    tentunya url itu match dengan function yang ada di back end (inilah View),
+    View tersebut pasti akan mengambil data dari model dan model ini akan merender
+    beberapa template lalu mengirimkannya kembali ke user 
+
+VENV
+    Flow membuat virtual env : VENV
+    1. python -m venv env
+    
+    Aktivasi VENV
+    1. masuk ke folder yang ada env nya
+    2. ketik env\scripts\activate
+
+    Deaktivasi
+    1. ketik deactivate
+
+DJANGO DOCUMENTATION COMMAND
+    django-admin --> untuk melihat command apa yang bisa di panggil lewat situ
+
+    django-admin startproject [project name] --> start the project eand create a file which setup the django application 
+
+    python manage.py runserver --> (cd ke file studybud dulu) start django server
+
+    django-admin startapp [app name] --> create app
+
+    python manage.py migrate --> activate and build default database
+
+    python manage.py makemigrations --> membuat migrations baru
+
+    python manage.py createsuperuser  --> membuat akun django admin panel
+
+    python manage.py flush --> menghapus semua data tabel (semua tabel) dan menghapus akun super user
+    ref : https://devsheet.com/django-how-to-delete-all-rows-from-a-table/#:~:text=Modal_Name.objects.all%28%29.delete%28%29%20This%20code%20deletes%20all%20of%20the%20rows,the%20table%20created%20with%20Django%20model%20-%20User.
+
+
+
+FILE-FILE .PY dalam PROJECT
+    WSGI.py
+        (Web Server Gateway Interface) ini server sebenarnya
+    
+    URLS.py
+        manage semua routing project kita, ketika akan berpindah page
+    
+    ASGI.py
+        (asynchronous Server Gateway Interface),  django punya async support
+
+    SETTINGS.py
+        konfigurasi inti project atau pusat pemberian command
+
+
+MENGHUBUNGKAN PROJEK DAN APP
+    Setelah membuat app. app ini harus di hubungkan dengan project.
+
+    1. ke file project
+    2. settings.py
+    3. pada list INSTALLED_APPS tambahkan '[nama app].apps.BaseConfig' --> string
+
+    alur koneksinya [nama.app] --> apps.py --> class BaseConfig
+
+
+
+FILE-FILE .PY DALAM APP
+    VIEWS.PY --> ketika seseorang ke spesifik url ini akan berisi fungsi atau kelas, dan akan menjalankan beberapa jenis query ke database atau template yang akan di render 
+    
+    MODELS.PY --> konfigurasi database
+
+URL ROUTING AND VIEWS
+    typically all of our view gonna be handled inside view.py file from the app 
+
+
+PERBEDAAN URLS DI APP DAN DI PROJEK
+    di app urls.py untuk setup url app, (for spesifik app)
+    di projek untuk root directories urls file (for full projek)
+
+
+MENGHUBUNGKAN FILE TEMPLATE DENGAN PROJEK
+    1. ke file projek
+    2. settings.py
+    3. cari list TEMPLATES
+    4. cari item 'DIRS'
+    5. ketik BASE_DIR / 'templates'
+
+MEREFERENCE TEMPLATES PADA APP
+    1. ke file app
+    2. views.py
+    3. terapkan fungsi render seperti di bawah
+
+    def room(request):
+        return render(request=request, template_name='room.html')
+
+TEMPLATES INHERITANCE
+    merender sebuah template bukan cara terbaik jika kita mungkin menambahkan
+    item seperti navigation bar, bayangkan harus menuliskan kode nav bar di
+    setiap template, menambahkan semua tag, semua styling. Lalu jika ada yang
+    dirubah kita harus mengedit dan memperbarui setiap template.
+
+    dalam Template Inheritance kita bisa include sections of templates
+    inside of other template.
+
+    untuk contoh penerapan
+    1. buat file navbar.html di dalam file templates
+    2. reference kan navbar.html dengan 
+        {% include '[nama file html].html' %}
+
+    penerapan Inheritance sebenarnya adalah dengan membuat file main.html dalam
+    folder templates. main.html memungkinkan kita untuk mengakses semua template
+    kita. jadi ketika membutuhkan suatu desain tinggal panggil saja.
+
+
+How DO WE PASS IN DATA INTO THE TEMPLATE (49:59)
+
+PELETAKAN TEMPLATE DI DALAM APP (55: 55)
+    nantinya ketika kita membuat projek besar kita ingin setiap app handle
+    setiap satu hal seperti user, room dll. jadi dari pada meletakan setiap
+    template nya di folder base (STUDYBUD) lebih baik meletakannya di folder app
+
+    penerapannya
+    1. membuat folder bernama templates
+    2. membuat folder yang namanya sesuai dengan nama app,
+        di dalam folder templates
+    3. meletakan file html
+    
+CARA HUBUNGKAN LOKASI FILE TEMPLATES HTML YANG BARU DENGAN APP
+    1. ke settings.py
+    2. pada parameter template_name tambahkan base/
+        ex : 'base/home.html'
+
+DYNAMIC URL ROUTING (58:35)
+
+GET DYNAMIC VALUES FROM OUR TEMPLATES (1:02:30)
+    misal dalam file urls.py ada path kaya dibawah
+
+    path('room/<str:pk>/' , view=views.room, name="room"),
+
+    misal dalam 'room/<str:pk>/', kata room kamu belum pasti mau dikasih
+    nama apa atau masih bisa berubah-ubah. nah gimana caranya biar kalo
+    tulisan room itu diganti tapi tidak usah repot-repot mengganti juga di
+    html yang mereference nya. 
+
+    kamu bisa membuat nya dinamis. dinamis maksudnya ketika kamu mengganti 
+    kata 'room' disitu kamu tidak perlu mengganti paramereter yang mereference
+    nya di file html. 
+
+    caranya dengan mamanfaaatkan name pada parameter path di urls.py,
+    pastikan parameter tidak diubah2 sehingga dapat selalu dipanggil dari
+    file html.
+
+    jika tidak dinamis pemanggilan referencenya /room/
+    tetapi setelah dibuat dinamis menjadi {{% url 'room'}}
+
+    NB : 
+        ketika menguji ini restart servernya
+
+PREPARE THE DATABASE (1:05:05)
+    jika kamu urut membuat django dari awal, hingga saat ini masih terlihat
+    tulisan seperti ini di terminal
+
+    """
+    You have 18 unapplied migration(s). Your project may not work properly 
+    until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+    Run 'python manage.py migrate' to apply them.
+    """
+
+    di dalam settings.py dalam file projek terdapat list INSTALLED_APPS,
+    ini berisi apps yang terinstal; secara default dan basically punya
+    database yang sudah disiapkan. So, kita punya beberapa tabel yang 
+    siap untuk di migrated seperti django membuat user table untuk 
+    authentication. Django juga telah membuat tabel untuk store session id
+    seperti kalo user login.
+
+    django menciptakan migrations ini basically seperti sql command
+    yang disiapkan untuk dieksekusi. Jadi tinggal di aktivasi tapi belum
+    di trigger 
+
+
+CARA MEMBUAT DEFAULT DATABASE DJANGO
+    ketik di terminal
+    python manage.py migrate --> activate and build default database
+
+
+MEMBUAT DATABASE (1:07:54)
+    1. ke models.py di file app
+    2. buka file foto database model untuk dapat gambaran
+        explain : 
+                    kita akan membuat python class yang merepresentasikan
+                    tabel database. dalam foto itu kelas project akan 
+                    membuat tabel di database bernama 'project'.
+
+                    Setiap atributnya merepresentasikan sebuah kolom
+                    dalam database.
+
+                    simpelnya class ini akan membuat template seperti
+                    apa data disimpan 
+
+
+MENAMBAHKAN MODEL KE DATABASE (1:13:00)
+    ketika kita menambahkan model ke database kita harus membuat migrations,
+    kita sudah punya folder migrations. yang folder ini lakukan adalah 
+    membuat file yang akan punya daftar command sql. 
+
+    bagaimna mengeksekusinya dan menambahkannya ke databas,
+    kita sudah memigrated database kita jadi kita telah pake built-in migrations
+    dan kita sekarang kita membuat migrations baru.
+
+    1. python manage.py makemigrations
+    2. python manage.py migrate  -- > untuk cek dan menghubungkan migrations yang telah kita buat
+
+    jadi model (tabel) yang dibuat di models.py sudah di dalam database
+
+
+MELIHAT DATABASE (1:15:18)
+    Menggunakan django admin panel.
+    akses http://127.0.0.1:8000/admin.
+
+    karena untuk masuk butuh akun. kita harus buat dengan
+    1. ketik python manage.py createsuperuser  --> membuat akun django admin panel
+    2. isi user, email, password
+
+    user : ditra
+    email : asyafaditra@gmail.com
+    pass : adminpanel02
+
+REGISTER MODEL YANG ANDA BUAT AGAR TERLIHAT DI ADMIN PANEL (1:17:40)
+    1. ke admin.py
+    2. ketik from .models import [nama model (nama kelas)]
+      ex : from .models import Room
+    3. ketik admin.site.register(Room)
+
+CARA MENAMPILKAN DATA DARI DATABASE (1:19:00)
+    ketika model nya sudah ada di admin panel dan terdapat
+    beberapa data, kita bisa mengaksesnya dan menampilkannya
+    caranya menggunakan query set
+
+    LIAT FILE IMG querysets
+
+    querysets = ModelName.objects.all()
+
+    .all() = query all the item pr model inside database
+    .get() = get a single object whereas all in filter 
+    .filter() = filter data down
+    .exclude() = reverse items out in like a reverse order
+
+    etc in query sets list.png
+
+SET NEW ROOM FROM DATABASE (1:24:44)
+
+ROOM CATEGORY (1:25:01)
+    one to many(1:26:04)
+
+USER MODEL (1:28:40)
+    https://docs.djangoproject.com/en/4.2/ref/contrib/auth/
+
+IMPORT USER MODEL AND CREATE A RELATIONSHIP (1:29:43)
+    NB: ketika ingin menghubungkan antara class Topic dan Room
+        dengan urutan class (dari atas) Topic terlebih dahulu
+
+        maka di Room Class nya
+        topic = models.ForeignKey(Topic, on_delete=models.CASECADE)
+
+        tapi jika urutan class (dari atas) Room terlebih dahulu
+        maka di Room class nya
+        topic = models.ForeignKey('Topic', on_delete=models.CASECADE)
+
+RUN THE MIGRATE TO ADD THE TOPIC CLASS TO THE DATABASE
+    python manage.py makemigrations
+    
+    after that command executed inside the migrations folder now
+    we're gonna see the second migrations file. it's gonna prep 
+    the migrations for any changes or any new tables.
+    So any time, you make a change to a model specifically to an attribute 
+    or adding in a new one, we need to run that 
+
+    python manage.py migrate
+
+    That command gonna add the new tabel to the database 
+
+
+CREATE RELATIONSHIP BETWEEN Topic Class AND Room Class (1:31:38)
+
+REGISTER NEW CLASS DATABASE TOPIC AND MESSAGE
+
+DISPLAY USERNAME AND TOPIC IN HOME.HTML (1:37:35)
+
+CRUD (1:39:25)
+    room_form.html template ini dibuat untuk merepresentasikan sebuah from
+    untuk mengupdate dan membuat room. jadi satu template untuk views (views.py)
+    yang berbeda 
+
+    menghubungkan home.html ke room_form.html (1:43:23) 
+
+    note (1:44:22)
+    I could manually create this form and then submit that to the back end, 
+    now django has different ways going about this, now if we have class based
+    views it's all built in already for us. We really don't even have to do much
+    we just submit it and it kind of just processes that magically, that's also
+    why i dont like class-based views especiallly for beginners because they're hard
+    for people to understand they're easy to use in basic structures but once you
+    need to customize somthing or to understand how it actually works, its hard to
+    make sense of it. So they're useful when you know them.
+
+    model form [forms.py created] (1:45:13)
+        is like a class based representation of a form 
+
+
+    Why we choose field that appear (1:47:05)
+        saya akan menyembunyikan nilai seperti User karena itu seharusnya 
+        otomatis tergenerated seperti logged in User yang membuatnya. aplikasi
+        harus tahu seorang User tidak seharusnya menentukan siapa dia di menu
+        dropdown.
+
+        # fields = ['name', 'body'] # menentukan mana yang tampil 
+    
+    Proses data (1:49:03)
+
+    Submit data (1:50:00)
+        liat di terminal tempat berjalannya server kita bisa liat csrf token, host,
+        topic, name, dan description 
+
+    if request.POST problem (1:50:36)
+
+    if form.is_valid (1:50:40):
+
+    after the user submit the data (valid data) and the data saved we want to direct them to the home page (1:51:08)
+
+sort newest item first (1:52:45)
+    We could done this in query set or we could add it direecly to the model method.
+
+updating room (1:54:14)
+    how do we get the data prefiled after the form show up (1:55:48)
+
+    process the new edited form and save to the database (1:57:55)
+
+apply delete(1:59:23)
+
+create file delete.html
+    this going to be dynamic template meaning that if we later on
+    when we go delete a comment. it's going to be the same template to delete
+    any item inside our website so all it is gonna be a confirmation so if you
+    click on it. it's gonna say are you sure want to delete and then whatever
+    item we are deleting. then we have back button we can click or we can click
+    on confirm.
+
+    request.META.HTTP_REFERER  : going to send the user to where they came from 
+
+search functionallty (2:06:27)
+    side bar (2:06:32)
+        this is gonna be some quick search functionality which means that we can render
+        out all topics we have. and user can simply click on of these topic and it's
+        gonna filter down room by topics
+
+    search bar at top of page (2:06:54)
+        User can also type in a certain parameter based on a topic or the actual title of
+        a room  or maybe even by some contents in that spesific room 
+
+add some styling (2:07:17)
+    first div : 
+        main container around everything
+    second div :
+        a container around topics
+    
+    third div :
+        a container around that list of room 
+
+create some layout here (2:08:48)
+    <style>
+    .home-container{
+        display: grid;
+        grid-template-columns: 1fr 3fr;  # 1 fraction 3 fraction, technically we created two columns and that fraction
+                                         # is specifying how many fractions of the website or the page going to take up
+    }
+</style>
+
+list out all the topics in browse topic (2:09:43)
+    now we're just going to list out everything but if we start adding in thousans of topic 
+    into our website we want to maybe filter these down by the top topics or maybe the topics
+    with the most rooms 
+
+    
+    <a href="{% url 'home' %}?q={{ topic.name }}">{{ topic }}</a>
+
+        send the user back to the home page, so the url is going to the home page 
+        except for outside of this {% url 'home' %}
+        we're going to add in a question mark then we're going to pass in the 
+        paramter "name" that's gonna be q and we're going to represent query 
+        so it can be whatever you want and we're gonna set that to equals.
+        and that's gonna be the topic name
+
+        What's gonna is when the user click on of those topic
+        it's gonna send the user to the home page and we're throwing in
+        the topic name
+
+add filter functionality in views.py (2:12:36)
+    fixing feature "all" in display all topic (2:13:40)
+
+    MY SOLUTION
+
+    q = request.GET.get('q')
+    
+    if q:
+        rooms = Room.objects.filter(topic__name=q)
+    else:
+        rooms = Room.objects.all()
+
+    
+    THE RIGHT SOLUTION explaining
+        instead of setting the value directly because at this point it's just going to 
+        set it to nothing and the filter still won't work. we can use a value called 
+        topic__name__icontains, well the value is actually just i contains not doublescore
+        but that's we have to add that in so that means is that it's gonna make sure that 
+        what ever value we have in the topic name at least contains what's in here.
+
+        contains
+        katakanlah user menekan topic python pada sidebar, pada url pasti terdapat /?q=Python
+        , jadi icontains akan melihat bahwa q nya paling tidak berisi 2 huruf pertama yaitu
+        "Py" lalu filter akan berjalan dan menemukan yang sesuai.
+
+        i
+        maksudnya adalah kita bisa membuatnya case sensitive yang maksudnya jika ada sebuah
+        capital P atau lowecase p , ini tidak berpengaruh.
+
+        jadi topic__name__icontains ==> jika q berisi paling tidak dua huruf pertama dari yang dicari
+                                        paling sesuai filter akan berjalan. tidak case sensitive
+
+             topic__name__contains ==> jika q berisi paling tidak dua huruf pertama dari yang dicari
+                                        paling sesuai filter akan berjalan. case sensitive
+
+        pembuktian http://127.0.0.1:8000/?q=web
+
+        masih banyak parameter lain seperti startswith, endswith
+
+
+
+adding search bar (2:15:36)
+    http://127.0.0.1:8000/?q=web ==> search manually
+
+    we don't want the user doing that search manually. Instead, we also 
+    want a user to be able to do that from their own search bar so they
+    don't want to have to manually do that (search manually) or be limitied
+    to that search parameter (in side bar we just limited in topics).
+
+    What if a user wants to search by specific name or maybe by somebody that
+    created the room. let's say you have a favourite room creator or a host and
+    you want to find them. so you can say something like go ahead  and find me all
+    rooms made by dennis so you'll type in my name and it will display those 
+
+    implemented at navbar.html (2:16:42)
+        jika sebuah form method nya "get" maka tidak butuh CSRF_TOKEN
+
+        biasanya search bar tidak ada tombolnya, instead user klik enter
+        maka dari itu input type nya "text"
+
+        jadi input url itu akan take whatever the user type in and throw it
+        into that url with q before that 
+
+
+How we can make dynamic values or dynamic search (2:18:03)
+    qlookup method (2:18:43)
+
+
+we want be able to get the room count here (2:21:09)
+    so the actual account of how many rooms we have here 
+
+autentication , user login (2:22:42)
+    when we provide our credentials this gets sent to the back end and in the back 
+    there is a database table called sessions. 
+        you can see this 'sessions' in your project settings.py in INSTALLED_APPS list,
+            'django.contrib.sessions'
+
+    (2:23:25)
+    and if you go actually use somthing like pg admin and postgrees, you'll be able
+    to see this table. so when the user logs in the username and the password (this at
+    django admin panel login page) it sent to the back end and a session token is created 
+    and this stores information about user. Once that user is autenticated we know 
+    know when this user logged in. who this user is and all this information
+
+    inspecting login django admin (2:23:37)
+        the login session will get created in the database and we're also going to to 
+        take that session and we're gonna store it in the browser. 
+        
+        now as we navigate through pages on our website, we don't have to keep logging in. 
+        
+        That session
+        is gonna be store and one each request it's gonna be sent to the backend 
+        and we're gonna check is this user actually someone  that's in website 
+        are they allowed to be here, are they authenticated and what permissions 
+        do they have 
+
+        after you click log in 
+        session id is created and stored in your browser. it also generate the token 
+    
+
+Log out functionallity
+
+create yourself authentication (2:25:05)
+    login_register.html ==> we're gonna have one template for a login and register form
+                            and the form itself will change based on what page the user's on
+                            whether they're logging in or trying to register. 
+    
+    views.py step (2:28:17)
+    
+    flash massages (2:23:41)
+        they store this, inside of django as far as i think they're in the sessions 
+        and they only are stored inside of one browser refresh.
+
+        after we import the messages
+            then we need to be able add in a message here. we can go ahead and do 
+            messages. the type of the messages. if the user doesn;t exist we want to 
+            throw in an error message
+
+        
+        authenticate, login (2:36:26)
+
+        and logout (2:39::08)
+
+restrict pages based on the user and their status, logged in or not (2:41:52)
+    what i want to do is make a quick import here and actually add in a decorator
+    above a view that i want to restrict. with class based views we use mix-ins
+    for this we can also use middleware for this 
+
+
+    @login_required(login_url='/login')
+        if this does not check the type of user what permissions they have 
+        that's going to be little bit more functionality but at this point 
+        once we add this decorator a user that is not authenticated if 
+        their session id is not in the browser and it's not credible 
+        they will be simply redirected to the login page.
+
+
+    update views case matching between the user whom create room and the privillege(2:44:33)
+        now in this case in theory if i know somebody's room id i can
+        just login and i'll be allowed to go  ahead and update the room 
+        . So i want ro restrict a user so let's see how do i want to do 
+        this.
+
+
+    hiding edit and delete button, just appear when room created the correspond user (2:46:42)
+    
+
+    restrict user access to the login url once they logged in, since user be able to access it manually
+    by type the url address http://127.0.0.1:8000/login/     (2:48:11)
+
+
+USER REGISTRATION (2:48:00)
+    apply code login_register.html(2:51:30)
+
+    django user creation form (2:53::00)
+    
+    form.save(commit=False)  # (2:56:39)
+        we're going to want to customize user submission here, so we can actually do something
+        like form.save(commit=False)
+
+        So technically what we're doing is we're actually saving this form and we're like 
+        freezing it in time here because we want to access the user that was created meaning
+        , if the form is valid the user is going to get created but we want to be able to
+        access the user right away.
+
+        so to do that we have to just add in commit is equal to False so we can actually get that 
+        user object. 
+
+        the reason why we want to do this, if for some reason the user added in like a upper case
+        in their name or they capitalize their name or maybe their email depending on how they're 
+        registering.
+
+        we want to makesure that's lowercase automatically. so we want to be able to clean this data
+
+
+        TAMBAHAN FITUR VIEW PADA SAAT USER REGISTRASI.
+            ketika akun user udah ada di data base. maka tawarkan forgot password
+
+            forgot password
+
+User comment Creation (3:01:34)
+        if we go to a room, called i want to learn html. I'm logged in as eric at this
+        point  i want to be able to actually make comments and join the conversation here
+        so let's go ahead and first work on the room page.
+
+        views.py (3:03:29)
+        messages = room.message_set.all()  # 
+
+        we can query child objects of a spesific room here. if we take the parent model in this case
+        we have a room to get all the children. all we have to do is specify the model name and in 
+        this case it's message and we don't put that in a capital letter, we put that in lowercase 
+        value. so message  the model name and then we can do _set.all(),
+        
+         it's basically saying give us
+        the set of messages that are related to this spesific room.
+
+        We got the room and now and we got all the messages
+
+
+        date filter (3:06:36)
+        
+        add filter to display the newest comment (3:07:08)
+
+        add features that make user can actually edit their own messages (3:08:00)
+
+        why we do the redirect after user write a comment (3:12:41)
+            the issue this is technically gonna be a post request and it's gonna mess up
+            some functionality here so we actually want that page fullt reload in a sense
+            clear what's going on and make sure that we're back on that page with a get request.
+
+            inti masalahnya adalah jika tidak di redirect ke page room nya maka sekali
+            post method berjalan maka selamanya method nya tidak akan berubah, efeknya
+            jika user refresh page maka akan post komen yang sama (jadi double)
+
+        delete functionality and participants (3:13:24)
+            (3:13:39) we are gonna have to add in some more functionality into our database.
+                 many to many : multiple objects can be connected to multiple other objects
+                 one to many  : on object can be connected to multiple other objects 
+
+
+            editing room.html
+
+            adding participants models.py (3:17:04)
+                applying many-to-many 
+        
+                participants = models.ManyToManyField(User, related_name='participants')
+
+                we're gonna add in the User here, so we already have this imported that's
+                the relationship and we have one small issue here because we already have
+                user model connected, 
+
+                We need to specify a related name. we can do this regardless but in this
+                case because we have it we need to specify it and that just means that
+                we can't reference a user because we  already have a user(host). so
+                to fix this we use related_name.
+
+            
+            select participants in django admin panel (3:18)
+            
+            displaying the participants(3:19:34)
+                room_messages = room.message_set.all().order_by('-created')  # you can see the message_set with help(room), order in descending
+
+                later on room_message, for many to one relationship we can do _set.all() method 
+                for many-to-many relationship just .all().
+
+            
+            what if other user wants to join a room ? (3:21:17)
+                konsepnya adalah ketika user komen dan post komennya maka user otomatis
+                akan menjadi participants di room tersebut. ()
+
+            
+            delete comment feature (3:22:48)
+
+Create activity feed \ recent activity (3:27:41)
+    The idea: (3:29:04)
+        i want to prompt user to actually engage in the website if they come here 
+        they don't see much activity people are less likely engage but they come in
+        and they see an active feed here they can actually see what's going on
+
+        maybe at some point you want to build in like a social networking feature
+        where you can follow people 
+        
+        you can modify this to only see what your friends are doing or people
+        that you are following are commenting. so if a friends of yours comments
+        on something on. it might look interesting so you click on it you check 
+        it out and it prompts you to engage.
+
+    
+    you can edit this part, this is where you can change it to where only, where
+    you can only see may be the people you follow if you (3:29:00)
+
+    User should be able to delete their own messages from the activity feed (3:35:03)
+
+    we have topics, activity, make them their own component here (3:35:50)
+        i want to be able actually reuse this activity feed and these topics 
+        and btw i can filter these down here so if i want. what i could do is 
+        actually modify these components ti filter down by a spesific topic
+    
+
+    Make reusable components (3:37:50)
+        create activity_component.html 
+
+        what we are gonna do here is make sure that we can use the same 
+        activity feed right here (at the home page) inside of our profile page 
+        later on.
+
+        we go to user's profile, we want to be able to see all the activity for that 
+        spesific user. so let's say i want to be able to see all of eric's activity
+        and 
+        
+        what i would have to do here is actually rewrite all this code right in the 
+        user profile page. so instead make that feed activity to a component.
+
+        create  feed activity component (3:38:37)
+
+        create  room component (3:39:51)
+
+
+
+Create user profile (3:43:05)
+
+
+Work on static files configuration (3:53:28)
+    any static files are basically any css files any images or javascript files
+    and in definition they're static so django has it's own way on figuring this
+    
+    so right now we've been writing our css inside our templates. We don't want to
+    do this. So what we're gonna do is move all the css outside of our templates 
+    and we're gonna create our own style sheet. 
+    
+    So in django we need to create our static files. there is different types of 
+    static files we can configure images. we can configure css 
+
+    creating static folder (3:54:15) 
+        1. buat folder bernama static di directory terluar
+            yang isinya env, app mu, folder project, dan manage.py
+
+        2. buat 2 folder di dalamnya bernama
+            a. images
+            b. styles
+
+        3. buat main.css di dalam folder styles
+
+        4. masuk ke settings.py di folder project mu
+
+        5. Tulis kan seperti ini 
+
+            STATICFILES_DIRS = [
+                BASE_DIR / 'static'
+            ]
+
+            ini untuk mengarahkan dimana folder static mu berada
+        
+        6. untuk tes coba buat ini di dalam main.css
+
+            body
+            {
+                background-color: aquamarine;
+            }
+
+        7. taruh ini di main.html mu
+
+            {% load static %}
+
+        8. tambahkan ini di bagian head di main.html mu
+
+            <link rel="stylesheet" href="{% static 'styles/main.css' %}" type="text/css" media="screen" >
+        
+        9. test dengan run server
+
+
+
+
+        use images (3:57:26)
+
+        differences for user uploaded images (3:58:37)
+            we'll get into like when a user uploads their profile picture
+            we do have to configure things in a different way.
+
+            in settings.py
+            STATIC_ROOT ==> we'll get into that later so i'll comment that out 
+            
+            and we also have to
+                            configure some urls for that and also static files in production
+                            are going to be handled a little bit differently than they are 
+                            in the development.
+
+
+
+        membenarkan room form (3:58:00)
+        1. membuat form host dan participants tidak di tampilkan
+        2. mengurus backend hasil dari poin 1 web harus simpan host dan participants
+            my way 
+
+            di bawah form.is_valid():
+                room = Room.objects.create(
+                host=request.user,
+                topic=form.cleaned_data['topic'],
+                name=form.cleaned_data['name'],
+                description=form.cleaned_data['description']
+            )
+        
+
+        theme installation work (4:02:56)
+            how this will work is we have a standard theme with some html, css, and a little bit of javascript
+            we're not going to worry about the css and js part. That's already added into the theme and that's just
+            gonna to add functionallity where we need it.
+
+            So we're gonna need to grab these html files and we're gonna have to replace a 
+            lot of the content that you see. So every single page here we're basically going to get
+            those pre-bulit templates we're going to add them into our code and then we're gonna have
+            to do things that django ways. 
+            
+            so for example the theme with the css files in the javasctipt files these are all 
+            set with all paths that already connected to that specific theme. We're gonna have todo add
+            our static files the django way. we're gonna have to replace our images and any other filler
+            content with our django tags and loops and if else statements.
+
+            So we're basically gonna have to add the templates and then modify the data that's inside of 
+            them.
+
+             go to https://github.com/divanov11/StudyBud/ clone this 
+
+             copy file theme ke directory terluar tempat folder env, project, app berada 
+
+! CHECKPOINT SEBELUM THEME installation SAVE BACKUP
+
+            adding the home page theme(4:04:58)
+                replace the home page with the theme template here
+            
+            connecting main template to our main.css (4:08:07)
+
+            conncecting the header (4:12:22)
+
+            add in javasctipt in user dropdown (4:14:09)
+
+            Showing the currently logged in user (4:15:45)
+
+            add the images if the user not logged in and studybud logo (4:18:56)
+
+            connecting the topics component(4:21:45)
+
+            <!-- 
+            {% if profile_page %}
+
+                <div>
+                    <a href="{% url 'user-profile' request.user.id %}">All</a>
+                </div>
+
+            {% else %}
+
+                <div>
+                    <a href="{% url 'home' %}">All</a>
+                </div>
+
+            {% endif %} -->
+
+            <!-- {% for topic in topics %} -->
+
+            <!-- 
+            {% if profile_page %}
+
+            <li>
+                <a href="{% url 'user-profile' request.user.id %}?q={{ topic.name }}">{{ topic.name }} <span>{{ }}</span></a>
+            </li>
+
+            {% else %}
+
+            <li>
+                <a href="{% url 'home' %}?q={{ topic.name }}">{{ topic.name }} <span>{{ }}</span></a>
+            </li>
+
+            {% endif %}
+
+            {% endfor %} -->
+
+
+
+            connecting the feed_component (4:26:05)
+
+                <div>
+
+                    <a href="{% url 'user-profile' room.host.id %}">
+                        @{{ room.host.username }}
+                    </a>
+
+                    <h5>
+                        {{ room.id }} -- <a href="{% url 'room' room.id %}">{{ room.name }}</a>
+                    </h5>
+
+                    <small>
+                        {{ room.topic.name }}
+                    </small>
+
+                </div>
+            
+            connecting activity feed (4:31:32)
+
+            connecting user profile (4:37:41)
+
+            conncecting room page (4:43:02)
+
+            connecting create room form (4:54:10)
+
+                    {% for field in form  %}
+                    <!-- ROOM NAME -->
+                    <div class="form__group">
+                        <label for="room_name">{{ field.label }}</label>
+                        {{ field }}
+                        <!-- <input id="room_name" name="room_name" type="text" placeholder="E.g. Mastering Python + Django" /> -->
+                    </div>
+                    {% endfor %}
+
+
+                manually code field from models (4:59:39)
+
+                Topic dropdown (5:01:42)
+
+                    editing views.py | tambain fitur otomatis tambain topic kalo topic nya belum ada (5:04:58)
+
+                                topic_name = request.POST.get('topic')
+                                topic, created = Topic.objects.get_or_create(name=topic_name)
+
+                                what's gonna happen in line 901 is get or create is gonna return 
+                                back either an object or it will return an object and created.
+
+                                if we pass in the topic_name in "name" paramereter 
+
+                                Let say we add javascript or python, we already have python.
+                                so get or create is gonna get the value of python and it's gonna
+                                return it inside of this topic variable, now the created will be
+                                False besause Python was not created. 
+
+                                Let say we just add like java. we dont have java in our Data base
+                                at this point so what's gonna happen is created will be true and
+                                this will simply create the object. So if it can't find it, it will
+                                create it 
+
+                    editing views.py | fix fitur update room biar muncul topic prefill nya + fix update bug (5:08:33)
+                
+            Allow user to editing their account (5:12:09)
+                working in form user-update.html (5:17:21)
+
+
+            connecting delete theme (5:25:45)
+                request.path|urlencode
+
+                ! CASE SETELAH MENGHAPUS ROOM (page sebelumnya, home page) maka setelah hapus room kembali ke home
+                ! Case setelah menghapus room (page sebelumnya, profile) maka setelah hapus room kembali ke profile
+
+            connecting login and register page theme (5:28:17)
+                dir(UserCreationForm) ==> liat semua atribut kelas
+
+                vars() ==> liat semua form yang ada 
+
+    MOBILE RESPONSIVENESS (5:36:07)
+
+        conncecting activity (5:47:59)
+
+
+
+    API (5:53:06)
+    json django rest framework build on top of django. so it's package specifically for django and it makes for building 
+    out apis very easy. 
+
+    Quick Summary of API
+    we can use api to maybe share data with other applications so in a sense. we can take all data in our website that we have.
+    then we can provide a series of urls or endpoints that we would call instructions on how to work with this data. This data 
+    would be retrieved usually in json format. 
+    
+    so, if you want to work with kind of front-end framework or maybe building out a mobile application for example using flutter
+    and django to create a mobile application call mobile to-do list. So this app need some kind of apis data to work with.
+    we need some kind of data if you want to work with react native, flutter, maybe you want to work with react js or angular
+    , or vue. 
+    
+    these all front-end framework that need apis. we could use it for that, we can also use it maybe to share data
+    for example facebook has their own api that you can use if you dont want to get the data but you dont want to go to the website.
+
+    they have certain apis that you can go to read the documentation and call their data and actually view and modify data in the
+    backend within their database using the api to interact with. so, it's a mean of communication and  a format of how we provide
+    data 
+
+    STEP
+        Setting up simple api
+            we could create a new app inside of our django project. but, 
+            
+            1. we just create a new folder inside app folder called api.
+            then create 
+            
+            2. __init__.py, 
+                urls.py, 
+                views.py,   (to respond with some json data when someone goes to our url)
+                serializers.py file.
+
+            3. code in views.Py
+                
+                'GET /api/rooms', 
+                (imagine our website gets huge it has millions of views and now people want to access our api
+                and build out their own application and maybe they just want to create like a website that just 
+                displays rooms on the most popular website in the world which is uh studybudy )
+
+
+                'GET /api/rooms/:id'
+                this will be like your documentation. that's gonna give you a json array of objects of all the rooms
+                in our database and we can control what kind of data get shown. Then if you want to get a spesific Room
+                . lets say you want to create a like a page for your project or your website go to rooms and then just 
+                go ahead and add in the id of the room that you want and that will get you single object about a single room.
+            
+            4. code in urls.py
+            5. conncecting the api to the project  (6:00:00)
+                    conncect the urlpatterns of api to the main projectx by adding
+
+                    path('api/', include('base.api.urls')),
+
+
+                    ["GET /api/", "GET /api/rooms", "GET /api/rooms/:id"] ==> after run server
+
+                    we have json response, this is now json data that anybody can make request to and actually pull this data
+                    in. So, they can use python, JS, whatever language. They can call this url if this was a live link. anybody
+                    can call this if its on domain.
+
+                    api can work without django rest framework
+            
+            6. installing django rest framework
+                    py -m pip install djangorestframework  ==> in the venv 
+
+            7. add in django rest framework in our INSTALLED_APPS in settings.py inside project folder
+
+                in INSTALLED_APPS list variable add in  'rest_framework',
+            
+            8. start building out my actual urls and make sure that they're based of django rest framework
+
+                add in this module to the views.py inside api folder 
+
+                from rest_framework.decorators import api_view
+                from rest_framework.response import Response
+
+                api_view decorator could use ['GET', 'PUT', 'POST'] parameter. this parameter allow you to do 
+                the correspond method of request
+            
+            
+            create another view for room (6:06:27)
+
+            dealing with Object of type Room is not JSON serializable ERROr (6:08:22)
+                what's happening here is we're making a query set and this is a python list of object
+                . So it's a python list query set and we need to make sure that we can serialize this 
+                data.
+
+                So that means that response cannot return back python objects. we can pass in python
+                list or dictionary and that json response method was able to serialize and convert it
+                but objects cannot be convertedd automatically.
+            
+
+            Working with serializers.py     (6:08:51)
+                This serializers re going to be classes that take a certain a model that we want to
+                serialize or object and it's gonna turn it into json data. So it's gonna basically 
+                take our python object and turn it into a json object or a javascript object and we
+                can return that. 
+
+                we're gonna import serializers, create a class, specify the model, and the fields 
+                that we want to serialize and that will be rendered out. 
+
+            adding users end point to see room's detail from their website with this api (6:12:00)
+                we want to give the user an end point to meybe open up a room in their website 
+                and view detail about it or maybe we're building that front end.
+
+                we can actually nest serializers so we can children in these (cursor at participants list json
+                returned by getRoom).
+
+                authentication also can be done by rest_framework and we use json web tokens 
+            
+
+            use javascript to make a call to api (6:14:22)
+                There is one issue that can occur when someone else tries to call this api
+
+                detecting the issue by inspect in browser (6:18:13)
+                    1. to the coolwebsites.html
+                    2. CTRL + SHIFT + i
+                    3. network
+                    4. refresh the page
+                    5. klik rooms/
+
+                we need to work one something called cores configurations. cors stands for cross
+                origin resources sharing.
+
+                the issue : (6:18:34)
+                    this person is trying to access our website here and django is saying i dont know 
+                    who you are accessing this website from a completely different resource and Im
+                    not gonna let you access this.
+                
+                solution:
+                    all we need to do is configure that so django can either allow all endpoints 
+                    to make request to our api or we can even provide a spesific set of urls that 
+                    are allowed to call our api.
+            
+            install django cors headers in venv (6:19:23)
+                py -m pip install django-cors-headers
+
+            adding dependencies to setting.py (6:19.00)
+                CORS_ALLOWED_ORIGINS ==> a list of specified urls that we're gonna allow 
+
+    
+    CUSTOMIZING USER MODEL 
+        the user model is already built into django this is something that contains how a user 
+        get authenticated and it contains very important information about a user and it's
+        a vital part of our application. 
+        
+        now there's multiple ways of adding to it for
+        example in our user model we don't have a bio, profile picture, maybe we want like A
+        full name value. we don't have this information in that user model now one thing we could do
+        is add one-to-one relationship and.
+        
+        this is how we do this in my django  2021 course.
+        we add in one-to-one relationship and we would simply create a profile model. So
+        the profile model would contain all the information like the user's facebook account
+        , social links, bios profile pictures and so on.
+
+        we created this one-to-one relationship and this is one-to-one relationship would 
+        simply connect to the user model and that means that a user can only have one profile 
+        can only have one user so we would connect those and then we would add in things 
+        like the profile picture and all that information to the profile model.
+
+        so this way we never actually have to touch the user model. Now what im already did in that 
+        course so you can  instead of using that method we're gonna modify the user model. Now
+        i typically do not like to use this method. 
+        
+        there's downs and ups to both sides with the 
+        method where we add ont-to-one  relationship it does require a little bit more configuration 
+        when you register your user or update information about the user. It does require some more 
+        configuration but it's safer  because the user model is not being touched.
+
+        we're actually going to override the user model and then we're gonna customize it. 
+        so i dont like doing this. so what aim gonna do here is create a completely new project.
+        we're gonna to create completely new django project. im gonna show you how to customize it.
+
+        so we can focus on just that part and then we're gonna into this project we're actually clear
+        our database now once we start messing that user models it's gonna really change things up 
+        and you'll see why and then we're gonna readd in data once that's remigrated 
+    
+    start customize user model (6:29:22)
+        1. start new project
+        2. start app
+        3. add app to the setting.py
+        4. customize the user model in the models.py
+            what we gonna do is create user model that inherit from the django built in user model
+            . So we will extend it.
+        5. tell the django that we want to use the extended class usermodel that we've created insted of
+            the original built in (6:31:51)
+        
+        6. run make migrations, migrate, create super user 
+        7. conncect the model in admin.py
+
+    customize the user model (5:35:02)
+        first thing is i want to make user i can register with an email value instead of username.
+
+
+    Back to work in original django project for INTEGRATING CUSTOM USER MODEL (6:38:30)
+        1. Clear the database
+            delete sqlite file and migrations folder in app 
+        
+        2. create new custom user models (6:41:47)
+                    class User(AbstractUser):   
+                        pass
+
+        3. tell the django that we want to use the extended class usermodel that we've created insted of
+            the original built in
+                in project folder add in 
+                    AUTH_USER_MODEL = 'base.User'
+
+        4. jika ada image field di extended class user modelnya
+                set ini di settings.py project 
+
+                MEDIA_URL = '/images/'                      ==> anggap sudah ada di dalam STATIC_ROOT di arahkan ke mana
+                MEDIA_ROOT = BASE_DIR / 'static_app/images' ==> BASE_DIR / '[nama folder hasil collectstatic]/images'
+                STATIC_ROOT = BASE_DIR / 'static_app'       ==> BASE_DIR / '[nama folder hasil collectstatic]'
+        
+        5. tambahkan di urls.py folder project
+            from django.conf import settings
+            from django.conf.urls.static import static
+
+            urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+        6. make migrations and remigrate (6:43:24) 
+            pastikan sebelum make migrations dan migrate user model barunya masih kosong,
+                            class User(AbstractUser):   
+                                    email = models.EmailField(null=True, unique=True)
+                                    # avatar = models.ImageField(null=True, default="avatar.svg") # jika sudah collect static dan ada static files
+    
+                                    USERNAME_FIELD = 'email'
+                                    REQUIRED_FIELDS = ['username']
+                                    
+                                    def __str__(self):
+                                        return f"{self.username} : {self.email}"
+
+        7. connect it to django-admin panel in admin.py (6:44:37)
+        8. create super user 
+                py manage.py createsuperuser
+
+        9. tambahkan field di user model
+        10. make migration and migrate
+        11. check di admin panel ganti foto avatar
+
+
+    Add in avatar picture profile (6:49:12)
+        installing dependencies for image field in the models.py by use this command
+
+            py -m pip install pillow
+
+        for user uploaded content we talk about static files earlier and these images are static files
+        there's a different way to handle user uploaded content or user uploaded images. so what's gonna 
+        happen here is when a user uploads it. first we need to tell django where to upload this picture 
+        to and then how to actually render out the image url.
+
+        in settings.py add in MEDIA_ROOT , its gonna tell django where to upload these user profile pictures
+        so if we later on  had some user uploaded content, maybe for a room or a user can add a picture to their
+        message. MEDIA_ROOT is gonna tell django when that form  gets submitted where this picture gonna go.
+
+        So django gonna look at MEDIA_ROOT  and it's gonna follow the file path that we give it 
+
+        MEDIA_URL its gonna route where url we upload the image 
+
+        static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) ==> set the url and get the file from 
+        media root 
+    
+    RENDER out the image that have been uploaded by user (6:56:34)
+        MEDIA_ROOT = BASE_DIR / 'static_app/images'
+
+        MEDIA_URL = '/images/' + avatar = models.ImageField(null=True, default="avatar.svg")
+
+        Karena MEDIA_ROOT nya diarahkan ke lokasi base dir/static_app/images
+
+        maka url untuk media akan diawali oleh MEDIA_URL karena kita set default avatarnya adalah avatar.svg
+        maka url yang terpanggil adalah     /images/avatar.svg
+
+        http://127.0.0.1:8000/images/wallpaper.jpg  ==>
+    
+    updating user profile update (7:01:26)
+        try to go away from the default user creation form on registration and i need to create an updated user form
+        to represent these fields in the forms.py
+
+        fix the profile picture update issue (7:02:50)
+            enctype="multipart/form-data" ==> this gonna tell us that we're actually submitting files with this form
+            and not just content in the original field
+        
+
+        update the registration form (7:04:47)
+
+        update the login form()
+(7:06:21)
+
+
+
+!
+https://github.com/divanov11/StudyBud/tree/master/base
+https://youtu.be/PtQiiknWUcI
+
+
+ada satu topic C
+
+topic ini punya 1 room, room ini akan di update topic nya
+
+kalo suatu topic hanya punya 1 room, jika room ini diupdate maka topic yang tidak punya room itu dihapus saja
+
+kalo suatu topic punya lebih dari 1 room, jika salah satu dari banyak room tersebut dirubah topic maka topic jangan di hapus
+

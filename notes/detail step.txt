@@ -1,0 +1,413 @@
+CREATE BASIC WORKSPACE
+1. create venv
+	ptyhon -m venv env
+
+2. activate env
+	env/scripts/activate
+
+3. install django inside venv
+	pip install django
+
+4. create a django project & app
+	django-admin startproject [name of project]
+
+	pindahkan env ke dalam, folder project lalu run venv ulang
+
+	py manage.py startapp [app's name]
+
+	nb :
+	perintah start app bisa dijalankan jika Anda sudah di directory manage.py
+
+5. memunculkan file db.sqlite3 
+	py manage.py runserver
+
+6. buat folder templates di directory terluar dan di dalam folder app
+	ex : 	
+		base  --> nama app
+		env
+		studybud  --> nama project
+		templates
+		...
+
+7. buat file html di folder templates terluar
+	ex : main.html, navbar.html
+
+8. hubungkan project dengan app
+	1. settings.py --> lokasi di project
+	2. cari list INSTALLED_APPS, tambahkan
+		'[nama apps].apps.[nama app huruf pertama kapital]Config'
+
+		nb :
+			anda bisa cek nama confignya di apps.py
+	
+	3. ALTERNATIVE 
+	cari list INSTALLED_APPS tambahkan    '[nama apps]',
+
+
+9. hubungkan folder templates (terluar) dengan project
+	1. ke file projek
+    2. settings.py
+    3. cari list TEMPLATES
+    4. cari item 'DIRS'
+    5. ketik BASE_DIR / 'templates'
+
+10. menghubungkan url projek dengan url app
+	1. urls.py --> lokasi di projek
+	2. from django.urls import path, include (tambahkan include)
+	3. di list urlpatterns tambahkan 
+		path('', include('[ nama app ].urls'))
+
+11. test run
+	1. views.py --> lokasi di app
+	2. ketik
+		from django.http import HttpResponse
+	3.buat fungsi
+		def home(request):
+			return HttpResponse('Hello World!')
+	
+	4. buat file dengan nama urls.py dalam folder app lalu ketik
+		from django.urls import path
+		from . import views
+
+		urlpatterns = [
+			path('', views.home, name='home'),
+		]
+	
+	5. python manage.py runserver
+
+12. py manage.py migrate ==> membuat default database
+
+13. py manage.py createsuperuser ==> membuat user god mode
+
+14. 
+
+
+setup file templates di app
+home.html
+room.html
+
+nah gimana caranya biar terhubung di templates di project
+main.html
+navbar.html
+
+Cara deploy model ke django admin
+1. py manage.py makemigrations [nama app]
+
+	nb: folder migrations terbentuk dalam folder app
+
+2. py manage.py migrate  ==> proses deploy ke django admin
+
+3. py manage.py sqlmigrate [nama app] [nama file .py yang baru terbentuk dalam folder migrations]
+
+4. register agar muncul di django admin PANEL
+	from .models import Room, Topic
+
+	# Register your models here.
+
+	class RoomAdmin(admin.ModelAdmin):
+		list_display = ("name", "description")
+
+	admin.site.register(Room, RoomAdmin)
+
+	class TopicAdmin(admin.ModelAdmin):
+		list_display = ("name")
+
+	admin.site.register(Topic, TopicAdmin)
+
+
+request = <WSGIRequest: POST '/create-room/'>
+
+request.POST = <QueryDict: {'csrfmiddlewaretoken': ['5Xa5Enu9avnPNaAN4ujIQniKpxbmtgcKXIb55QJwPESITKber743VjfHdRRzKtsg'], 'host': ['1'], 'topic': ['1'], 'name': ['al hauna'], 'description': ['desc']}>
+
+type(request.POST) = <class 'django.http.request.QueryDict'>
+
+! FIX MASALAH TIME ZONE
+1. set time zone sesuai user (tidak ngaruh dengan django admin)
+	a. USE_TZ = False (settings.py)
+	b. buktikan dengan buka py manage.py shell 
+		from django.utils import timezone
+			x = timzone.now()
+			print(x)
+
+2. set time zone sesuai zona yang diinginkan (ngaruh ke django admin)
+	a. set TIME_ZONE = 'EST'			# pilih salah satu ['EST', 'UTC', 'Asia/Kolkata']
+
+3. Set time zone berdasarkan lokasi
+	a. py -m pip install pytz 	==> install di env project
+	b. import pytz 				==> run di py manage.py shell
+	c. run kode berikut:
+			for tz in pytz.all_timezones_set:
+				if '[benua/kota]' in tz:			==> benua/kota ini diawali huruf kapital
+					print(tz)
+
+	d. set TIME_ZONE = '[tz yang ditemukan diatas]'  ==> set di setting.py di folder project
+	
+
+
+
+! CREATE BASIC WORKSPACE
+1. create venv
+	ptyhon -m venv env
+
+2. activate env
+	env/scripts/activate
+
+3. install django inside venv
+	py -m pip install django
+
+4. create a django project & app
+	django-admin startproject [name of project]
+
+	pindahkan env ke dalam, folder project lalu run venv ulang
+
+	py manage.py startapp [app's name]
+
+	nb :
+	perintah start app bisa dijalankan jika Anda sudah di directory manage.py
+
+5. memunculkan file db.sqlite3 
+	py manage.py runserver
+
+6. buat folder templates di directory terluar dan di dalam folder app
+	ex : 	
+		base  --> nama app
+		env
+		studybud  --> nama project
+		templates
+		...
+
+7. buat file html di folder templates terluar
+	ex : main.html, navbar.html
+
+8. hubungkan project dengan app
+	1. settings.py --> lokasi di project
+	2. cari list INSTALLED_APPS, tambahkan
+		'[nama apps].apps.[nama app dg huruf pertama kapital]Config'
+
+		nb :
+			anda bisa cek nama confignya di apps.py di folder app nya
+	
+	3. ALTERNATIVE 
+	cari list INSTALLED_APPS tambahkan    '[nama apps]',
+
+
+9. hubungkan folder templates (terluar) dengan project
+	1. ke file projek
+    2. settings.py
+    3. cari list TEMPLATES
+    4. cari item 'DIRS'
+    5. ketik BASE_DIR / 'templates'
+
+10. menghubungkan url projek dengan url app
+	1. urls.py --> lokasi di projek
+	2. from django.urls import path, include (tambahkan include)
+	3. di list urlpatterns tambahkan 
+		path('', include('[nama folder app].urls'))
+
+
+11. test run
+	1. views.py --> lokasi di app
+	2. ketik
+		from django.http import HttpResponse
+	3.buat fungsi
+		def home(request):
+			return HttpResponse('Hello World!')
+	
+	4. buat file dengan nama urls.py dalam folder app lalu ketik
+		from django.urls import path
+		from . import views
+
+		urlpatterns = [
+			path('', views.home, name='home'),
+		]
+	
+	5. python manage.py runserver
+
+
+creating static folder (3:54:15) 
+        1. buat folder bernama static di directory terluar
+            yang isinya env, app mu, folder project, dan manage.py
+
+			! kalo mau buat static_app--> buat folder staticnya di dalem folder app. cara lengkapnya di scroll bawah
+
+        2. buat 2 folder di dalamnya bernama
+            a. images
+            b. styles
+
+        3. buat main.css di dalam folder styles
+
+        4. masuk ke settings.py di folder project mu
+
+        5. Tulis kan seperti ini 
+
+            STATICFILES_DIRS = [
+                BASE_DIR / 'static'
+            ]
+
+            ini untuk mengarahkan dimana folder static mu berada
+        
+        6. untuk tes coba buat ini di dalam main.css
+
+            body
+            {
+                background-color: aquamarine;
+            }
+
+        7. taruh ini di main.html mu
+
+            {% load static %}
+
+        8. tambahkan ini di bagian head di main.html mu
+
+            <link rel="stylesheet" href="{% static 'styles/main.css' %}" type="text/css" media="screen" >
+        
+        9. test dengan run server
+
+
+
+CEK PIP LIST
+	py -m pip list
+
+! HANDLE MASALAH STATIC FILE
+
+		my_tennis_club				(folder BASE_DIR)
+			manage.py
+			my_tennis_club/			(folder project)
+			members/				(folder app)
+				templates/
+				static/
+					myfirst.css		(css yang dibuat)
+
+		Ke settings.py di folder project
+			DEBUG = False
+
+			ALLOWED_HOSTS = ['*']
+
+		py -m pip install whitenoise
+
+		tambahkan 	'whitenoise.middleware.WhiteNoiseMiddleware',	 pada list MIDDLEWARE di settings.py
+
+		di settings.py tambahkan
+			STATIC_ROOT = BASE_DIR / '[nama folder static nya]'
+
+			STATIC_URL = 'static/'
+		
+
+		py manage.py collectstatic
+
+			muncul seperti ini 
+				my_tennis_club
+					members/
+						templates/
+						static/
+					my_tennis_club/
+					[nama folder static nya]/		(ini akan muncul)
+						admin/
+						myfirst.css			(akan mencopy myfirst.css yang ada dalam folder static app)
+
+		Tambahkan 
+
+			{% load static %} dan <link rel="stylesheet" href="{% static 'myfirst.css' %}">
+			
+			di file html yang digunakan sebagai templates
+		
+		? DIATAS ADALAH CARA MENAMBAHKAN SEBUAH STATIC FILE DALAM FOLDER STATIC APLIKASI, DAN
+		? BAGAIMANA CARA MENGGUNAKANNYA DALAM APLIKASI
+
+		! TAPI GIMANA KALO APLIKASI LAIN YANG MASIH DALAM SATU PROJECT INGIN MENGGUNAKANNYA JUGA ?
+		
+		membuat folder yang akan menampung static file yang berfungsi secara global
+
+			my_tennis_club
+
+				members/
+					templates/
+					static/
+
+				my_tennis_club/
+
+				productionfiles/		
+					admin/
+					myfirst.css
+				
+				mystaticfiles/		(ini folder barunya)
+
+		Buat file css di dalamnya
+
+			my_tennis_club
+
+				members/
+					templates/
+					static/
+
+				my_tennis_club/
+
+				productionfiles/		
+					admin/
+					myfirst.css
+				
+				mystaticfiles/		
+					myglobal.css
+
+
+		Atur settings.py
+
+			STATIC_ROOT = BASE_DIR / 'productionfiles'
+
+			STATIC_URL = 'static/'
+
+			#Add this in your settings.py file:
+			STATICFILES_DIRS = [
+				BASE_DIR / 'mystaticfiles'
+			]
+
+			Note : 
+				perenderan file static dimulai di STATICFILES_DIRS, urutan perenderannya sesuai yang anda
+				ketik di list tersebut. lalu, jika filenya tidak ditemukan di list itu, maka pencarian
+				dilakukan dalam folder static setiap aplikasi
+		
+		
+		py manage.py collectstatic
+
+!HANDLE masalah salah direct static file di local host
+	1. py manage.py runserver
+	2. buka local host 8000
+	3. inspect elemen 
+	4. SHIFT + CTRL + R
+
+	key word : delete css cache with inspect elemen 
+							
+
+
+
+1. buat login page
+2. jika berhasil login di arahkan ke home
+3. ada keterangan di home bahwa si user atas nama siapa telah login
+
+1. buat register page
+2. jika berhasil, login
+3. jika berhasil login, diarahkan ke home
+4. ada keterangan di home bahwa si user atas nama siapa telah login
+
+
+! requirements.txt
+py -m pip freeze requirements.txt
+
+
+# tutorial yt login register logout
+https://youtu.be/PnDCJfGpk2Y?si=cnH3HDHa-1oeKpe2
+
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class RedirectLoggedInUsersMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+
+
+from django.contrib.auth.views import LoginView
+
+class LoginView(RedirectLoggedInUsersMixin, LoginView):
+    pass
